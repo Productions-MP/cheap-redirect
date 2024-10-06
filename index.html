@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirect Page</title>
+    <script>
+        // Change this to your custom URL
+        const customUrl = "https://v2.myproimages.com/HLS";
+        
+        // Redirect to custom URL after a brief delay
+        window.onload = function() {
+            setTimeout(() => {
+                window.location.href = customUrl;
+            }, 2000); // Redirects after 2 seconds
+        };
+    </script>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+        h1 {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Redirecting you to a new page...</h1>
+    <p>If you are not redirected, <a href="https://example.com">click here</a>.</p>
+</body>
+</html>
