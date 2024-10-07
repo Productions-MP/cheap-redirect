@@ -1,18 +1,6 @@
-const { MongoClient } = require('mongodb');
+import { MongoClient } from 'mongodb';
 
-const uri = process.env.MONGO_URI;
-
-if (!uri) {
-  console.error('MONGO_URI is not defined');
-  return {
-    statusCode: 500,
-    body: JSON.stringify({ error: 'Internal server error: MongoDB URI not set' }),
-  };
-}
-
-const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-
-exports.handler = async (event, context) => {
+export async function handler(event, context) {
   try {
     const contactId = event.queryStringParameters.id;
 
@@ -22,6 +10,18 @@ exports.handler = async (event, context) => {
         body: JSON.stringify({ error: 'Missing id parameter' }),
       };
     }
+
+    const uri = process.env.MONGO_URI;
+
+    if (!uri) {
+    console.error('MONGO_URI is not defined');
+    return {
+        statusCode: 500,
+        body: JSON.stringify({ error: 'Internal server error: MongoDB URI not set' }),
+    };
+    }
+
+    const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
     await client.connect();
     const database = client.db('capture-link');
@@ -61,4 +61,4 @@ exports.handler = async (event, context) => {
   } finally {
     await client.close();
   }
-};
+}
