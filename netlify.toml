@@ -1,0 +1,5 @@
+[[redirects]]
+  from = "/"
+  to = "/.netlify/functions/redirect"
+  status = 200
+  query = { id = ":id" }  # Map 'id' query string parameter
