@@ -1,5 +1,7 @@
 import { MongoClient } from 'mongodb';
 
+let cachedClient = null;
+
 export async function handler(event, context) {
   try {
     const contactId = event.queryStringParameters.id;
@@ -11,23 +13,26 @@ export async function handler(event, context) {
       };
     }
 
-    const uri = process.env.MONGO_URI;
+    if (!cachedClient) {
+      const uri = process.env.MONGO_URI;
 
-    if (!uri) {
-    console.error('MONGO_URI is not defined');
-    return {
-        statusCode: 500,
-        body: JSON.stringify({ error: 'Internal server error: MongoDB URI not set' }),
-    };
+      if (!uri) {
+        console.error('MONGO_URI is not defined');
+        return {
+          statusCode: 500,
+          body: JSON.stringify({ error: 'Internal server error: MongoDB URI not set' }),
+        };
+      }
+
+      cachedClient = new MongoClient(uri);
+      await cachedClient.connect();
     }
 
-    const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-
-    await client.connect();
+    const client = cachedClient;
     const database = client.db('capture-link');
     const contacts = database.collection('contacts');
 
-    const contact = await contacts.findOne({ "_id": {"$oid": contactId} });
+    const contact = await contacts.findOne({"_id": {"$oid": contactId}});
 
     if (!contact) {
       return {
@@ -52,13 +57,12 @@ export async function handler(event, context) {
       },
       body: '',
     };
+
   } catch (error) {
     console.error('Error:', error);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: 'Internal server error' }),
     };
-  } finally {
-    await client.close();
   }
 }
