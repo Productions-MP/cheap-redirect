@@ -1,8 +1,9 @@
-import { MongoClient } from 'mongodb';
+const { MongoClient, ObjectId } = require('mongodb');
+require('dotenv').config();
 
 let cachedClient = null;
 
-export async function handler(event, context) {
+module.exports.handler = async (event, context) => {
   try {
     const contactId = event.queryStringParameters.id;
 
@@ -32,7 +33,7 @@ export async function handler(event, context) {
     const database = client.db('capture-link');
     const contacts = database.collection('contacts');
 
-    const contact = await contacts.findOne({"_id": {"$oid": contactId}});
+    const contact = await contacts.findOne({"_id": new ObjectId(contactId)});
 
     if (!contact) {
       return {
@@ -41,7 +42,7 @@ export async function handler(event, context) {
       };
     }
 
-    const redirectUrl = contact.redirectUrl;
+    const redirectUrl = contact.gallery_url;
 
     if (!redirectUrl) {
       return {
@@ -65,4 +66,4 @@ export async function handler(event, context) {
       body: JSON.stringify({ error: 'Internal server error' }),
     };
   }
-}
+};
