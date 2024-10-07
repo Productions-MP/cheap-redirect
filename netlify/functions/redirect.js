@@ -1,9 +1,18 @@
-import { MongoClient } from 'mongodb';
+const { MongoClient } = require('mongodb');
 
 const uri = process.env.MONGO_URI;
+
+if (!uri) {
+  console.error('MONGO_URI is not defined');
+  return {
+    statusCode: 500,
+    body: JSON.stringify({ error: 'Internal server error: MongoDB URI not set' }),
+  };
+}
+
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
-export async function handler(event, context) {
+exports.handler = async (event, context) => {
   try {
     const contactId = event.queryStringParameters.id;
 
@@ -27,7 +36,7 @@ export async function handler(event, context) {
       };
     }
 
-    const redirectUrl = contact.gallery_url;
+    const redirectUrl = contact.redirectUrl;
 
     if (!redirectUrl) {
       return {
@@ -43,7 +52,6 @@ export async function handler(event, context) {
       },
       body: '',
     };
-
   } catch (error) {
     console.error('Error:', error);
     return {
@@ -53,4 +61,4 @@ export async function handler(event, context) {
   } finally {
     await client.close();
   }
-}
+};
