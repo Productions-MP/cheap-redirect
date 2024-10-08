@@ -25,7 +25,11 @@ module.exports.handler = async (event, context) => {
         };
       }
 
-      cachedClient = new MongoClient(uri);
+      cachedClient = new MongoClient(uri, {
+        useUnifiedTopology: true,
+        poolSize: 10, // Adjust this to your expected workload
+        connectTimeoutMS: 1000, // Timeout connection quickly
+      });
       await cachedClient.connect();
     }
 
@@ -33,7 +37,11 @@ module.exports.handler = async (event, context) => {
     const database = client.db('capture-link');
     const contacts = database.collection('contacts');
 
-    const contact = await contacts.findOne({"_id": new ObjectId(contactId)});
+    // Only fetch the gallery_url field
+    const contact = await contacts.findOne(
+      { "_id": new ObjectId(contactId) },
+      { projection: { gallery_url: 1 } }
+    );
 
     if (!contact) {
       return {
