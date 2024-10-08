@@ -5,21 +5,12 @@ let cachedClient = null;
 
 module.exports.handler = async (event, context) => {
   try {
-    const contactId = event.queryStringParameters.id;
+    const contactId = event.pathParameters.id;
 
     if (!contactId) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: 'Missing url parameter "id"' }),
-      };
-    }
-
-    const imageId = event.queryStringParameters.image_id;
-
-    if (!contactId) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: 'Missing url parameter "image_id"' }),
+        body: JSON.stringify({ error: 'Missing path parameter "id"' }),
       };
     }
 
