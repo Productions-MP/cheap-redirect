@@ -25,11 +25,7 @@ module.exports.handler = async (event, context) => {
         };
       }
 
-      cachedClient = new MongoClient(uri, {
-        useUnifiedTopology: true,
-        poolSize: 10, // Adjust this to your expected workload
-        connectTimeoutMS: 1000, // Timeout connection quickly
-      });
+      cachedClient = new MongoClient(uri);
       await cachedClient.connect();
     }
 
