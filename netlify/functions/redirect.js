@@ -5,7 +5,7 @@ let cachedClient = null;
 
 module.exports.handler = async (event, context) => {
   try {
-    const contactId = event.pathParameters.id;
+    const contactId = event.path.replace('/.netlify/functions/redirect/', '').replace(/\//gim, '')
 
     if (!contactId) {
       return {
