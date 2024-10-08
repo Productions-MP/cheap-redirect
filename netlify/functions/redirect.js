@@ -10,7 +10,16 @@ module.exports.handler = async (event, context) => {
     if (!contactId) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: 'Missing id parameter' }),
+        body: JSON.stringify({ error: 'Missing url parameter "id"' }),
+      };
+    }
+
+    const imageId = event.queryStringParameters.image_id;
+
+    if (!contactId) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: 'Missing url parameter "image_id"' }),
       };
     }
 
@@ -18,10 +27,9 @@ module.exports.handler = async (event, context) => {
       const uri = process.env.MONGO_URI;
 
       if (!uri) {
-        console.error('MONGO_URI is not defined');
         return {
           statusCode: 500,
-          body: JSON.stringify({ error: 'Internal server error: MongoDB URI not set' }),
+          body: JSON.stringify({ error: 'Internal server error' }),
         };
       }
 
@@ -33,7 +41,6 @@ module.exports.handler = async (event, context) => {
     const database = client.db('capture-link');
     const contacts = database.collection('contacts');
 
-    // Only fetch the gallery_url field
     const contact = await contacts.findOne(
       { "_id": new ObjectId(contactId) },
       { projection: { gallery_url: 1 } }
@@ -42,7 +49,7 @@ module.exports.handler = async (event, context) => {
     if (!contact) {
       return {
         statusCode: 404,
-        body: JSON.stringify({ error: 'Contact not found' }),
+        body: JSON.stringify({ error: 'Contact record not found' }),
       };
     }
 
@@ -50,8 +57,8 @@ module.exports.handler = async (event, context) => {
 
     if (!redirectUrl) {
       return {
-        statusCode: 500,
-        body: JSON.stringify({ error: 'No redirect URL found for this contact' }),
+        statusCode: 404,
+        body: JSON.stringify({ error: 'Redirect URL not found' }),
       };
     }
 
